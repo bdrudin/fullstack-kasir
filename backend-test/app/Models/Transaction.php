@@ -4,16 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\TransactionDetails;
+
 
 class Transaction extends Model
 {
     use HasFactory;
-    protected $fillable = [
-        'food_id', 'quantity', 'total_price'
-    ];
-
-    public function food()
+    protected $guarded = [];
+    public function details()
     {
-        return $this->belongsTo(Food::class);
+        return $this->hasMany(TransactionDetails::class);
     }
 }

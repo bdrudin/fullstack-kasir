@@ -15,12 +15,7 @@ class CreateTransactionsTable extends Migration
     {
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('food_id');
-            $table->integer('quantity');
-            $table->float('total_price');
-
             $table->timestamps();
-            $table->foreign('food_id')->references('id')->on('food');
         });
     }
 

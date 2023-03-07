@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Food;
 use App\Models\Transaction;
+
 use Illuminate\Http\Request;
 
 class TransactionController extends Controller
@@ -16,8 +16,6 @@ class TransactionController extends Controller
     public function index()
     {
         //
-        $transactions = Transaction::with('food')->get();
-        return response()->json($transactions);
     }
 
     /**
@@ -28,36 +26,9 @@ class TransactionController extends Controller
      */
     public function store(Request $request)
     {
-        $transactions = $request->all();
-        $transactionData = [];
-
-        foreach ($transactions as $transaction) {
-            $food = Food::find($transaction['food_id']);
-
-            if (!$food) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Food not found'
-                ], 404);
-            }
-
-            $totalPrice = $food->harga * $transaction['quantity'];
-            $transactionData[] = [
-                'food_id' => $food->id,
-                'quantity' => $transaction['quantity'],
-                'total_price' => $totalPrice,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ];
-        }
-
-        $transaction = Transaction::insert($transactionData);
-
-        return response()->json([
-            'success' => true,
-            'data' => $transaction
-        ]);
+        // 
     }
+
 
 
     /**
@@ -69,17 +40,6 @@ class TransactionController extends Controller
     public function show(Transaction $transaction)
     {
         //
-        $transaction = Transaction::with('food')->find($transaction->food_id);
-        if (!$transaction) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Transaction not found'
-            ], 404);
-        }
-        return response()->json([
-            'success' => true,
-            'data' => $transaction
-        ]);
     }
 
     /**
@@ -92,23 +52,6 @@ class TransactionController extends Controller
     public function update(Request $request, Transaction $transaction)
     {
         //
-        $food = Food::find($request->food_id);
-        if (!$food) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Food not found'
-            ], 404);
-        }
-
-        $transaction->food_id = $food->id;
-        $transaction->quantity = $request->quantity;
-        $transaction->total_price = $food->harga * $request->quantity;
-        $transaction->save();
-
-        return response()->json([
-            'success' => true,
-            'data' => $transaction
-        ]);
     }
 
     /**
@@ -120,10 +63,5 @@ class TransactionController extends Controller
     public function destroy(Transaction $transaction)
     {
         //
-        $transaction->delete();
-        return response()->json([
-            'success' => true,
-            'message' => 'Transaction deleted successfully'
-        ]);
     }
 }

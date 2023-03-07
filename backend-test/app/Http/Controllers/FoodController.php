@@ -14,7 +14,10 @@ class FoodController extends Controller
      */
     public function index()
     {
-        $foods = Food::all();
+        $foods = Food::all()->map(function ($food) {
+            $food->foto = $food->foto ? asset($food->foto) : null;
+            return $food;
+        });
         return response()->json($foods);
     }
 
@@ -28,16 +31,23 @@ class FoodController extends Controller
     {
         $validatedData = $request->validate([
             'nama' => 'required',
-            'harga' => 'required|integer'
+            'harga' => 'required|integer',
+            'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
 
-        $food = Food::create($validatedData);
+        if ($request->hasFile('foto')) {
+            $foto = $request->file('foto')->store('public/food');
+            $validatedData['foto'] = $foto;
+        }
+
+        $foods = Food::create($validatedData);
 
         return response()->json([
             'success' => true,
-            'data' => $food
+            'data' => $foods
         ]);
     }
+
 
     /**
      * Display the specified resource.
@@ -53,6 +63,8 @@ class FoodController extends Controller
                 'message' => 'Food not found'
             ], 404);
         }
+
+        $food->foto = $food->foto ? asset($food->foto) : null;
 
         return response()->json([
             'success' => true,
@@ -75,7 +87,10 @@ class FoodController extends Controller
         ]);
 
         $food = Food::findOrFail($food->id);
+
         $food->update($validatedData);
+
+        $food->foto = $food->foto ? asset($food->foto) : null;
 
         return response()->json([
             'success' => true,
