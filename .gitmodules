@@ -1,0 +1,3 @@
+[submodule "fullstack-kasir"]
+	name = frontend-test
+	path = submodules/frontend-test
